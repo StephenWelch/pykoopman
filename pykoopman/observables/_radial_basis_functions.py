@@ -260,23 +260,22 @@ class RadialBasisFunction(BaseObservables):
             C = self.centers[:, index_of_center]
             r_squared = np.sum((x - C[np.newaxis, :]) ** 2, axis=1)
 
-            match self.rbf_type:
-                case "thinplate":
-                    y_ = r_squared * np.log(np.sqrt(r_squared))
-                    y_[np.isnan(y_)] = 0
-                case "gauss":
-                    y_ = np.exp(-self.kernel_width**2 * r_squared)
-                case "invquad":
-                    y_ = np.reciprocal(1 + self.kernel_width**2 * r_squared)
-                case "invmultquad":
-                    y_ = np.reciprocal(np.sqrt(1 + self.kernel_width**2 * r_squared))
-                case "polyharmonic":
-                    y_ = r_squared ** (self.polyharmonic_coeff / 2) * np.log(
-                        np.sqrt(r_squared)
-                    )
-                case _:
-                    # if none of the above cases match:
-                    raise ValueError("provided rbf_type not available")
+            if self.rbf_type == "thinplate":
+                y_ = r_squared * np.log(np.sqrt(r_squared))
+                y_[np.isnan(y_)] = 0
+            elif self.rbf_type == "gauss":
+                y_ = np.exp(-self.kernel_width ** 2 * r_squared)
+            elif self.rbf_type == "invquad":
+                y_ = np.reciprocal(1 + self.kernel_width ** 2 * r_squared)
+            elif self.rbf_type == "invmultquad":
+                y_ = np.reciprocal(np.sqrt(1 + self.kernel_width ** 2 * r_squared))
+            elif self.rbf_type == "polyharmonic":
+                y_ = r_squared ** (self.polyharmonic_coeff / 2) * np.log(
+                    np.sqrt(r_squared)
+                )
+            else:
+                # if none of the above cases match:
+                raise ValueError("provided rbf_type not available")
 
             y[:, y_index + index_of_center] = y_
 
